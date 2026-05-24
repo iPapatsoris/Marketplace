@@ -1,7 +1,7 @@
-package com.expense_tracker.user;
+package com.marketplace.user;
 
-import com.expense_tracker.user.dto.UpdateUserRequest;
-import com.expense_tracker.user.dto.UserResponse;
+import com.marketplace.user.dto.UpdateUserRequest;
+import com.marketplace.user.dto.UserResponse;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;

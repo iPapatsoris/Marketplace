@@ -1,4 +1,4 @@
-package com.expense_tracker.user;
+package com.marketplace.user;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

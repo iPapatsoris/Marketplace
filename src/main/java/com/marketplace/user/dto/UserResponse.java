@@ -1,4 +1,4 @@
-package com.expense_tracker.user.dto;
+package com.marketplace.user.dto;
 
 public record UserResponse(Long id, String name, String email) {
 }

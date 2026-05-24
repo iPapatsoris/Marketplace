@@ -1,9 +1,8 @@
-package com.expense_tracker.user;
+package com.marketplace.user;
 
-import com.expense_tracker.user.dto.CreateUserRequest;
-import com.expense_tracker.user.dto.UpdateUserRequest;
-import com.expense_tracker.user.dto.UserResponse;
-import lombok.NoArgsConstructor;
+import com.marketplace.user.dto.CreateUserRequest;
+import com.marketplace.user.dto.UpdateUserRequest;
+import com.marketplace.user.dto.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
