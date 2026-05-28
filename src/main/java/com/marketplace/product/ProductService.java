@@ -4,6 +4,7 @@ import com.marketplace.product.dto.CreateProductRequest;
 import com.marketplace.product.dto.CreateProductResponse;
 import com.marketplace.product.dto.UpdateProductRequest;
 import com.marketplace.product.dto.UpdateProductResponse;
+import com.marketplace.product.exception.ProductNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,8 +21,8 @@ public class ProductService {
     }
 
     public UpdateProductResponse updateProduct(Long id, UpdateProductRequest updateProductRequest) {
-       var product = productRepository.findById(id);
-       var updatedProduct = productMapper.updateProduct(updateProductRequest, product.orElseThrow());
+       var product = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException("Product with id %s does not exist".formatted(id)));
+       var updatedProduct = productMapper.updateProduct(updateProductRequest, product);
        productRepository.save(updatedProduct);
 
        return productMapper.toUpdateProductResponse(updatedProduct);

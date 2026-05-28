@@ -16,5 +16,5 @@ public record CreateProductRequest(
 
         @PositiveOrZero
         @NotNull
-        int inventory
+        Integer inventory
 ) {}
