@@ -1,6 +1,7 @@
 package com.marketplace.exception;
 
 import com.marketplace.product.exception.ProductNotFoundException;
+import jakarta.persistence.OptimisticLockException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -89,6 +90,16 @@ public class GlobalExceptionHandler {
     ) {
         ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
         pd.setTitle("Product not found");
+        pd.setDetail(ex.getMessage());
+        return pd;
+    }
+
+    @ExceptionHandler(OptimisticLockException.class)
+    public ProblemDetail handle(
+            OptimisticLockException ex
+    ) {
+        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.CONFLICT);
+        pd.setTitle("Product version conflict");
         pd.setDetail(ex.getMessage());
         return pd;
     }

@@ -2,5 +2,5 @@ package com.marketplace.product.dto;
 
 import java.math.BigDecimal;
 
-public record UpdateProductResponse(String name, BigDecimal price, int inventory) {
+public record UpdateProductResponse(Long version, String name, BigDecimal price, int inventory) {
 }
