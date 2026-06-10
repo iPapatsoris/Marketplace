@@ -8,16 +8,14 @@ import org.mapstruct.*;
 
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
-    CreateProductRequest toCreateProductRequest(Product product);
-    CreateProductResponse toCreateProductResponse(Product product);
-    Product toProduct(CreateProductRequest createProductRequest);
+    CreateProductResponse toCreateProductResponse(Product entity);
+    Product toEntity(CreateProductRequest dto);
 
-    UpdateProductRequest toUpdateProductRequest(Product product);
-    UpdateProductResponse toUpdateProductResponse(Product product);
+    UpdateProductResponse toUpdateProductResponse(Product entity);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "version", ignore = true)
-    Product updateProduct(UpdateProductRequest updateUserRequest, @MappingTarget Product product);
+    Product updateProduct(UpdateProductRequest dto, @MappingTarget Product entity);
 }
 
 

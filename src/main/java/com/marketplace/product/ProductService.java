@@ -19,7 +19,7 @@ public class ProductService {
     private final ProductRepository productRepository;
 
     public CreateProductResponse createProduct(CreateProductRequest createProductRequest) {
-        Product product = productMapper.toProduct(createProductRequest);
+        Product product = productMapper.toEntity(createProductRequest);
         productRepository.save(product);
 
         return productMapper.toCreateProductResponse(product);
