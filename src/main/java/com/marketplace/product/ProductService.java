@@ -6,9 +6,9 @@ import com.marketplace.product.dto.UpdateProductRequest;
 import com.marketplace.product.dto.UpdateProductResponse;
 import com.marketplace.product.exception.ProductNotFoundException;
 import jakarta.persistence.OptimisticLockException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
