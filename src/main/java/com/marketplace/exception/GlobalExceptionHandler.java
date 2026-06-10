@@ -1,5 +1,6 @@
 package com.marketplace.exception;
 
+import com.marketplace.invetory.reservation.exception.InsufficientStockException;
 import com.marketplace.product.exception.ProductNotFoundException;
 import jakarta.persistence.OptimisticLockException;
 import jakarta.validation.ConstraintViolationException;
@@ -90,6 +91,16 @@ public class GlobalExceptionHandler {
     ) {
         ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
         pd.setTitle("Product not found");
+        pd.setDetail(ex.getMessage());
+        return pd;
+    }
+
+    @ExceptionHandler(InsufficientStockException.class)
+    public ProblemDetail handleProductNotFound(
+            InsufficientStockException ex
+    ) {
+        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.CONFLICT);
+        pd.setTitle("Insufficient stock");
         pd.setDetail(ex.getMessage());
         return pd;
     }

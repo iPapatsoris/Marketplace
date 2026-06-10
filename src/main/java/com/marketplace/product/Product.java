@@ -1,10 +1,13 @@
 package com.marketplace.product;
 
+import com.marketplace.invetory.reservation.InventoryReservation;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.List;
 
 @Entity
 @Table
@@ -16,6 +19,7 @@ public class Product {
     private Long id;
 
     @Version
+    @Column(nullable = false)
     Long version;
 
     @Column(nullable = false)
@@ -33,6 +37,8 @@ public class Product {
        this.inventory = inventory;
     }
 
+    @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    List<InventoryReservation> reservations;
 }
 
 
