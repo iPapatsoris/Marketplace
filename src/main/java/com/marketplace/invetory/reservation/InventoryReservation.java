@@ -1,8 +1,11 @@
 package com.marketplace.invetory.reservation;
 
 import com.marketplace.product.Product;
+import com.marketplace.product.ProductSnapshot;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -30,6 +33,10 @@ public class InventoryReservation {
 
     @Column(nullable = false)
     private Instant expiresAt;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    private ProductSnapshot productSnapshot;
 
     public InventoryReservation() {
         status = ACTIVE;

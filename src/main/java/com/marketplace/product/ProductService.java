@@ -5,6 +5,7 @@ import com.marketplace.product.dto.CreateProductResponse;
 import com.marketplace.product.dto.UpdateProductRequest;
 import com.marketplace.product.dto.UpdateProductResponse;
 import com.marketplace.product.exception.ProductNotFoundException;
+import com.marketplace.product.repository.ProductRepository;
 import jakarta.persistence.OptimisticLockException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
