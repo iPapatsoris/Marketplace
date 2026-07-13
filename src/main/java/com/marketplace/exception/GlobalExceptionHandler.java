@@ -1,6 +1,10 @@
 package com.marketplace.exception;
 
-import com.marketplace.invetory.reservation.exception.InsufficientStockException;
+import com.marketplace.reservation.exception.InsufficientStockException;
+import com.marketplace.reservation.exception.ReservationExpiredException;
+import com.marketplace.reservation.exception.ReservationNotFoundException;
+import com.marketplace.order.exception.PaymentAlreadyCompleteException;
+import com.marketplace.order.exception.PaymentAlreadyInitiatedException;
 import com.marketplace.product.exception.ProductNotFoundException;
 import jakarta.persistence.OptimisticLockException;
 import jakarta.validation.ConstraintViolationException;
@@ -10,10 +14,11 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import tools.jackson.databind.exc.MismatchedInputException;
-import tools.jackson.databind.exc.UnrecognizedPropertyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.exc.MismatchedInputException;
+import tools.jackson.databind.exc.UnrecognizedPropertyException;
 
 
 import java.util.List;
@@ -76,7 +81,7 @@ public class GlobalExceptionHandler {
             pd.setDetail("Unknown field " + upe.getPropertyName());
         } else if (specificException instanceof MismatchedInputException mie) {
             String field = mie.getPath().stream()
-                              .map(fieldRef -> fieldRef.getPropertyName())
+                              .map(JacksonException.Reference::getPropertyName)
                                       .collect(Collectors.joining());
 
              pd.setDetail("Field '%s' expects %s".formatted(field, mie.getTargetType().getSimpleName()));
@@ -101,6 +106,46 @@ public class GlobalExceptionHandler {
     ) {
         ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.CONFLICT);
         pd.setTitle("Insufficient stock");
+        pd.setDetail(ex.getMessage());
+        return pd;
+    }
+
+    @ExceptionHandler(ReservationExpiredException.class)
+    public ProblemDetail handleExpiredReservation(
+            ReservationExpiredException ex
+    ) {
+        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.CONFLICT);
+        pd.setTitle("Reservation expired");
+        pd.setDetail(ex.getMessage());
+        return pd;
+    }
+
+    @ExceptionHandler(ReservationNotFoundException.class)
+    public ProblemDetail handleReservationNotFound(
+            ReservationNotFoundException ex
+    ) {
+        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
+        pd.setTitle("Reservation not found");
+        pd.setDetail(ex.getMessage());
+        return pd;
+    }
+
+    @ExceptionHandler(PaymentAlreadyInitiatedException.class)
+    public ProblemDetail handlePaymentAlreadyInitiated(
+            PaymentAlreadyInitiatedException ex
+    ) {
+        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.CONFLICT);
+        pd.setTitle("Payment already initiated");
+        pd.setDetail(ex.getMessage());
+        return pd;
+    }
+
+    @ExceptionHandler(PaymentAlreadyCompleteException.class)
+    public ProblemDetail handlePaymentAlreadyComplete(
+            PaymentAlreadyCompleteException ex
+    ) {
+        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.CONFLICT);
+        pd.setTitle("Payment already complete");
         pd.setDetail(ex.getMessage());
         return pd;
     }

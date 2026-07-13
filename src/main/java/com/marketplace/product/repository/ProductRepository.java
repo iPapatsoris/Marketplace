@@ -9,11 +9,10 @@ import java.util.Optional;
 public interface ProductRepository extends JpaRepository<Product, Long>, ProductRepositoryCustom {
 
     @Query("""
-            SELECT inventory
-            FROM Product
-            WHERE id = :id
-            """)
+        SELECT inventory
+        FROM Product 
+        WHERE id = :id
+""")
     Optional<Integer> findInventoryById(Long id);
-
     boolean existsByIdAndVersion(Long id, Long version);
 }

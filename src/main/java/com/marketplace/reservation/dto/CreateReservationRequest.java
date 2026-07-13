@@ -1,10 +1,10 @@
-package com.marketplace.invetory.reservation.dto;
+package com.marketplace.reservation.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 
-public record CreateInventoryReservationRequest(
+public record CreateReservationRequest(
         @NotNull
         @Positive
         Integer quantity,

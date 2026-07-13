@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Custom implementation as JPA / Hibernate doesn't support RETURNING
+ * Custom implementation as JPA / Hibernate doesn't support RETURNING return value mapping
  */
 @Repository
 @RequiredArgsConstructor

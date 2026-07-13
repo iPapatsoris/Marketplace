@@ -1,21 +1,18 @@
-package com.marketplace.invetory.reservation;
+package com.marketplace.reservation;
 
 import com.marketplace.product.Product;
-import com.marketplace.product.ProductSnapshot;
 import jakarta.persistence.*;
 import lombok.Data;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
-import static com.marketplace.invetory.reservation.InventoryReservationStatus.ACTIVE;
+import static com.marketplace.reservation.ReservationStatus.ACTIVE;
 
 @Entity
 @Table
 @Data
-public class InventoryReservation {
+public class Reservation {
     @Id
     @GeneratedValue
     private Long id;
@@ -29,16 +26,18 @@ public class InventoryReservation {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private InventoryReservationStatus status;
+    private ReservationStatus status;
 
     @Column(nullable = false)
     private Instant expiresAt;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "jsonb")
-    private ProductSnapshot productSnapshot;
+    @Column(nullable = false, columnDefinition = "text")
+    private String productSnapshot;
 
-    public InventoryReservation() {
+    @Column
+    private Long orderId;
+
+    public Reservation() {
         status = ACTIVE;
         expiresAt = Instant.now().plus(10, ChronoUnit.MINUTES);
     }

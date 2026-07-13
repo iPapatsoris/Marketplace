@@ -1,12 +1,11 @@
 package com.marketplace.product;
 
-import com.marketplace.invetory.reservation.InventoryReservation;
+import com.marketplace.reservation.Reservation;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.List;
 
 @Entity
@@ -31,14 +30,8 @@ public class Product {
     @Column(nullable = false)
     int inventory;
 
-    public Product(String name, BigDecimal price, int inventory) {
-       this.name = name;
-       this.price = price;
-       this.inventory = inventory;
-    }
-
     @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    List<InventoryReservation> reservations;
+    List<Reservation> reservations;
 }
 
 

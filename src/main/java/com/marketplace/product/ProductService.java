@@ -33,7 +33,6 @@ public class ProductService {
             throw new OptimisticLockException("Product with id %d has changed".formatted(id));
         }
        var updatedProduct = productMapper.updateProduct(updateProductRequest, product);
-       productRepository.save(updatedProduct);
 
        return productMapper.toUpdateProductResponse(updatedProduct);
     }
