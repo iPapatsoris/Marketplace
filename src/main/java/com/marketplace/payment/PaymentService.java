@@ -26,7 +26,7 @@ public class PaymentService {
     private final ObjectMapper objectMapper;
 
     @Transactional
-    PaymentInitiateResponse initiatePayment(Long reservationId) {
+    public PaymentInitiateResponse initiatePayment(Long reservationId) {
         int updated = reservationRepository.markAsPaymentInitiated(reservationId);
 
         if (updated == 0) {
