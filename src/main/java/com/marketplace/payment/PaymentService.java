@@ -2,7 +2,7 @@ package com.marketplace.payment;
 
 import com.marketplace.payment.outbox.PaymentPayload;
 import com.marketplace.reservation.ReservationRepository;
-import com.marketplace.reservation.ReservationStatus;
+import com.marketplace.reservation.entity.ReservationStatus;
 import com.marketplace.reservation.exception.ReservationExpiredException;
 import com.marketplace.reservation.exception.ReservationNotFoundException;
 import com.marketplace.payment.dto.PaymentInitiateResponse;

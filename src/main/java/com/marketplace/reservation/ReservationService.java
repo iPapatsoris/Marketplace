@@ -1,8 +1,11 @@
 package com.marketplace.reservation;
 
+import com.marketplace.product.Product;
 import com.marketplace.reservation.dto.CreateReservationRequest;
 import com.marketplace.reservation.dto.CreateReservationResponse;
 import com.marketplace.reservation.dto.ReservationResponse;
+import com.marketplace.reservation.entity.Reservation;
+import com.marketplace.reservation.entity.ReservationFactory;
 import com.marketplace.reservation.exception.InsufficientStockException;
 import com.marketplace.product.ProductSnapshot;
 import com.marketplace.product.repository.ProductRepository;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
 
+import java.time.Clock;
 import java.util.Optional;
 
 @Service
@@ -23,6 +27,7 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final ProductRepository productRepository;
     private final ObjectMapper objectMapper;
+    private final ReservationFactory reservationFactory;
 
     /**
      * Reserves a quantity of the selected product. Protected against race conditions with optimistic locking.
@@ -44,11 +49,9 @@ public class ReservationService {
             Optional<Integer> inventoryByIdOptional = productRepository.findInventoryById(productID);
             throw new InsufficientStockException(productID, dto.quantity(), inventoryByIdOptional.orElse(null));
         }
-
-        Reservation reservation = reservationMapper.toEntity(dto);
         String productSnapshotAsString = objectMapper.writeValueAsString(optionalProductSnapshot.get());
-        reservation.setProductSnapshot(productSnapshotAsString);
-        reservation.setProduct(productRepository.getReferenceById(productID));
+        Product productRef = productRepository.getReferenceById(productID);
+        Reservation reservation = reservationFactory.create(dto, productSnapshotAsString, productRef);
 
         reservationRepository.save(reservation);
 

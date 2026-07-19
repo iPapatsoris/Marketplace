@@ -1,5 +1,7 @@
 package com.marketplace.reservation;
 
+import com.marketplace.reservation.entity.Reservation;
+import com.marketplace.reservation.entity.ReservationStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
