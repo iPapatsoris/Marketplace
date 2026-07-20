@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import tools.jackson.databind.ObjectMapper;
@@ -28,7 +27,6 @@ import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
-import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 import static java.time.temporal.ChronoUnit.*;
@@ -74,15 +72,13 @@ public class ReservationServiceTest {
                     newReservationId, quantityRequest, fixedClock.instant().plus(10, MINUTES)
             );
 
-            String productName = "chair";
-            BigDecimal productPrice = new BigDecimal(35);
-            ProductBuilder productBuilder = new ProductBuilder();
-             Product  product = productBuilder
+             Product  product = new ProductBuilder()
                      .withId(productId)
-                     .withName(productName)
-                     .withPrice(productPrice).build();
+                     .withName("chair")
+                     .withPrice(new BigDecimal(35))
+                     .build();
 
-            ProductSnapshot productSnapshot = new ProductSnapshot(productName, productPrice);
+            ProductSnapshot productSnapshot = new ProductSnapshot(product.getName(), product.getPrice());
 
             when(productRepository.reserveInventory(
                     productId, productVersionRequest, quantityRequest
@@ -90,7 +86,7 @@ public class ReservationServiceTest {
 
             when(productRepository.getReferenceById(productId)).thenReturn(product);
 
-            when(reservationRepository.save(any())).thenAnswer(
+            when(reservationRepository.save(any(Reservation.class))).thenAnswer(
                     invocationOnMock -> {
                         Reservation reservation = invocationOnMock.getArgument(0);
                         reservation.setId(newReservationId);
@@ -161,11 +157,10 @@ public class ReservationServiceTest {
         @Test
         void shouldReturnReservationWhenItExists() {
             Long id = 1L;
-            ReservationBuilder reservationBuilder =
-                    new ReservationBuilder()
-                            .withId(id)
-                            .withOrderId(5L);
-            Reservation storedReservation = reservationBuilder.build();
+            Reservation storedReservation =  new ReservationBuilder()
+                    .withId(id)
+                    .withOrderId(5L)
+                    .build();
 
             ReservationResponse expectedResponse = new ReservationResponse(
                     storedReservation.getId(), storedReservation.getStatus(), storedReservation.getOrderId());
@@ -173,9 +168,9 @@ public class ReservationServiceTest {
             when(reservationRepository.findById(id))
                     .thenReturn(Optional.of(storedReservation));
 
-            ReservationResponse result = reservationService.getReservation(id);
+            ReservationResponse response = reservationService.getReservation(id);
 
-            assertEquals(expectedResponse, result);
+            assertEquals(expectedResponse, response);
         }
 
         @Test
