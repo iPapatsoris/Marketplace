@@ -28,6 +28,16 @@ public class ProductBuilder {
         return this;
     }
 
+    public ProductBuilder withInventory(int inventory) {
+        this.inventory = inventory;
+        return this;
+    }
+
+    public ProductBuilder withVersion(Long version) {
+        this.version = version;
+        return this;
+    }
+
     public Product build() {
         Product product = new Product();
         product.setId(id);
