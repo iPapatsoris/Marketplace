@@ -6,9 +6,6 @@ import jakarta.validation.constraints.PositiveOrZero;
 
 import java.math.BigDecimal;
 
-// Any way to reuse the validation rules, to ensure they'll be the same
-// between create and edit?
-
 public record UpdateProductRequest(
         Long version,
 
@@ -16,11 +13,9 @@ public record UpdateProductRequest(
         String name,
 
         @PositiveOrZero
-        @NotNull
         BigDecimal price,
 
         @PositiveOrZero
-        @NotNull
-        int inventory
+        Integer inventory
 ){};
 
