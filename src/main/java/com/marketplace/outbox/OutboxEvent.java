@@ -3,11 +3,6 @@ package com.marketplace.outbox;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-import tools.jackson.databind.JsonNode;
-
-import java.time.Duration;
 import java.time.Instant;
 
 @Entity
@@ -47,18 +42,18 @@ public class OutboxEvent {
         this.payload = payload;
     }
 
-    public void markProcessed() {
+    public void markProcessed(Instant processedAt) {
         status = OutboxEventStatus.PROCESSED;
-        processedAt = Instant.now();
+        this.processedAt = processedAt;
     }
 
-    public void markFailed() {
+    public void markFailed(Instant processedAt) {
         status = OutboxEventStatus.FAILED;
-        processedAt = Instant.now();
+        this.processedAt = processedAt;
     }
 
-    public void scheduleRetry(Duration delay) {
+    public void scheduleRetry(Instant nextAttemptAt) {
         attempts++;
-        nextAttemptAt = Instant.now().plus(delay);
+        this.nextAttemptAt = nextAttemptAt;
     }
 }

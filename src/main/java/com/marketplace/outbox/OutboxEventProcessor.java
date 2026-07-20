@@ -15,6 +15,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class OutboxEventProcessor {
     private final OutboxEventRepository outboxRepository;
+    private final OutboxEventService outboxEventService;
     private final OutboxEventHandlerRegistry registry;
     private final TransactionTemplate transactionTemplate;
     private final ObjectMapper objectMapper;
@@ -67,10 +68,10 @@ public class OutboxEventProcessor {
         try {
             runHandler(event);
         } catch (OutboxEventFailureException ex) {
-            event.markFailed();
+            outboxEventService.markFailed(event);
             return;
         }
-        event.markProcessed();
+        outboxEventService.markProcessed(event);
     }
 
     void scheduleRetry(Long eventId) {
@@ -79,7 +80,10 @@ public class OutboxEventProcessor {
             System.out.printf("Event with id %d not found%n", eventId); // switch to a warning log
             return;
         }
-        failedEventOptional.get().scheduleRetry(Duration.ofMinutes(1));
+        outboxEventService.scheduleRetry(
+                failedEventOptional.get(),
+                Duration.ofMinutes(1)
+        );
     }
 
     @SuppressWarnings("unchecked")
