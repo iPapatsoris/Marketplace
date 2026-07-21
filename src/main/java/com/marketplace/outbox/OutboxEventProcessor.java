@@ -59,7 +59,7 @@ public class OutboxEventProcessor {
     void processEvent(Long eventId) {
         Optional<OutboxEvent> optionalEvent = outboxRepository.findAndLockSingleEventSkipLocked(eventId);
         if (optionalEvent.isEmpty()) {
-            System.out.println("Event with id %d not found".formatted(eventId)); // switch to a warning log
+            System.out.printf("Event with id %d already being processed or doesn't exist, skipping%n", eventId); // switch to a warning log
             return;
         }
 
