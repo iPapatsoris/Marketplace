@@ -10,6 +10,7 @@ public record UpdateProductRequest(
         @NotNull
         Long version,
 
+        // TODO: change to allowing NULL, but with custom rules if not NULL (length, whitespace, etc)
         @NotBlank
         String name,
 
