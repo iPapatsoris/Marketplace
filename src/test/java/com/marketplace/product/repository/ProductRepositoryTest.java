@@ -68,7 +68,7 @@ class ProductRepositoryTest {
         }
 
         @Test
-        void shouldNotReserveInventoryWhenIdsMismatch() {
+        void shouldNotReserveInventoryWhenProdutDoesNotExist() {
             Product product = new ProductBuilder()
                     .withId(null)
                     .build();

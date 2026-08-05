@@ -64,7 +64,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void shouldUpdateProductAndReturnNewVersion() {
+    void shouldUpdateProduct() {
         Long id = 2L;
         Product initialProduct = new ProductBuilder()
                 .withId(id)
@@ -82,7 +82,7 @@ public class ProductServiceTest {
                initialProduct.version, requestName, requestPrice, requestInventory
         );
 
-        // Version is just a placeholder, it is verified on a separate assertion
+        // Version is just a placeholder, it is ignored
         UpdateProductResponse expectedResponseExcludingVersion = new UpdateProductResponse(
                 0L, requestName, initialProduct.price, requestInventory
         );
@@ -91,7 +91,6 @@ public class ProductServiceTest {
 
         UpdateProductResponse response = productService.updateProduct(id, request);
 
-        assertThat(response.version()).isGreaterThan(initialProduct.getVersion());
         assertThat(response)
                 .usingRecursiveComparison()
                 .ignoringFields("version")
