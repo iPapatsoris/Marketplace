@@ -32,8 +32,9 @@ public class ProductService {
         if (!Objects.equals(product.version, updateProductRequest.version())) {
             throw new OptimisticLockException("Product with id %d has changed".formatted(id));
         }
-       var updatedProduct = productMapper.updateProduct(updateProductRequest, product);
+        productMapper.updateProduct(updateProductRequest, product);
+        productRepository.flush(); // Version is incremented during SQL
 
-       return productMapper.toUpdateProductResponse(updatedProduct);
+       return productMapper.toUpdateProductResponse(product);
     }
 }
