@@ -8,7 +8,7 @@ import java.time.Instant;
 import static com.marketplace.reservation.entity.ReservationStatus.ACTIVE;
 
 public class ReservationBuilder {
-    private Long id = 1L;
+    private Long id = null;
     private Product product = ProductBuilder.aProduct().build();
     private int quantity = 5;
     private ReservationStatus status = ACTIVE;
