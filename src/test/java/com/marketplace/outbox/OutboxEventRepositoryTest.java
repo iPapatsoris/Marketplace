@@ -1,14 +1,16 @@
 package com.marketplace.outbox;
 
 import com.marketplace.annotations.RepositoryTest;
+import com.marketplace.outbox.OutboxEventProcessorTest.DummyPayload;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
@@ -32,8 +34,8 @@ public class OutboxEventRepositoryTest {
     @Autowired
     TransactionTemplate tx;
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    @MockitoBean
+    private Clock clock;
 
     /** We are disabling @DataJpaTest's behavior of wrapping each test with a transaction
      *  in order to test concurrent transactions, so we need to manually undo DB changes after each test.
@@ -75,9 +77,7 @@ public class OutboxEventRepositoryTest {
         @DisplayName("If the event is locked by a transaction, others should NOT block when attempting to acquire it, should skip it instead")
         @Transactional(propagation = NOT_SUPPORTED)
         void shouldSkipEventIfLocked() throws ExecutionException, InterruptedException {
-            OutboxEvent outboxEvent = new OutboxEventBuilder()
-                    .withId(null)
-                    .build();
+            OutboxEvent outboxEvent = new OutboxEventBuilder<DummyPayload>().build(clock);
             Long id = tx.execute(status -> (Long) entityManager.persistAndGetId(outboxEvent));
 
             CountDownLatch rowLocked = new CountDownLatch(1);
@@ -108,12 +108,8 @@ public class OutboxEventRepositoryTest {
         @DisplayName("Locking an event should not interfere with locking other events")
         @Transactional(propagation = NOT_SUPPORTED)
         void shouldLockDifferentEvents() throws ExecutionException, InterruptedException {
-            OutboxEvent outboxEvent1 = new OutboxEventBuilder()
-                    .withId(null)
-                    .build();
-            OutboxEvent outboxEvent2 = new OutboxEventBuilder()
-                    .withId(null)
-                    .build();
+            OutboxEvent outboxEvent1 = new OutboxEventBuilder<DummyPayload>().build(clock);
+            OutboxEvent outboxEvent2 = new OutboxEventBuilder<DummyPayload>().build(clock);
 
             record InsertedIds(Long id1, Long id2) {}
 
