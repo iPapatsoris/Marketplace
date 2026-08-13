@@ -8,6 +8,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@ConditionalOnProperty(
+        name = "scheduler.enabled",
+        havingValue = "true"
+)
 public class ReservationExpirationJob {
         private final ReservationService reservationService;
 

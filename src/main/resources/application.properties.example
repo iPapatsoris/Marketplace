@@ -18,3 +18,7 @@ spring.jackson.deserialization.fail-on-unknown-properties=true
 # To error when passing string to a number type in DTOs
 # Still allows passing number to a string type and converts
 spring.jackson.mapper.allow-coercion-of-scalars=false
+
+# Used in conjuction with @ConditionalOnProperty on classes that contain scheduled methods
+# Allows disabling scheduling in testing to avoid side effects
+scheduler.enabled=true

@@ -13,7 +13,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Target(TYPE)
 @Retention(RUNTIME)
-@SpringBootTest
+@SpringBootTest(properties = {"scheduler.enabled=false"})
 @AutoConfigureRestTestClient
 @Import(TestcontainersConfiguration.class)
 public @interface SpringIntegrationTest {
