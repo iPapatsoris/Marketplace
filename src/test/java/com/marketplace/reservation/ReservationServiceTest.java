@@ -52,7 +52,7 @@ public class ReservationServiceTest {
 
     @BeforeEach
     void setup() {
-        reservationService = new ReservationService(reservationMapper, reservationRepository, productRepository, objectMapper, reservationFactory);
+        reservationService = new ReservationService(reservationMapper, reservationRepository, productRepository, objectMapper, reservationFactory, fixedClock);
     }
 
     @Nested
