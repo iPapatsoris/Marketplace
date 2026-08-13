@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.util.Optional;
 
 @Service
@@ -24,10 +26,11 @@ public class PaymentService {
     private final ReservationRepository reservationRepository;
     private final OutboxEventRepository outboxEventRepository;
     private final ObjectMapper objectMapper;
+    private final Clock clock;
 
     @Transactional
     public PaymentInitiateResponse initiatePayment(Long reservationId) {
-        int updated = reservationRepository.markAsPaymentInitiated(reservationId);
+        int updated = reservationRepository.markAsPaymentInitiated(reservationId, Instant.now(clock));
 
         if (updated == 0) {
             Optional<ReservationStatus> inventoryReservationStatusOptional =
@@ -44,7 +47,7 @@ public class PaymentService {
         }
         PaymentPayload paymentPayload = new PaymentPayload(reservationId);
         String payloadAsString = objectMapper.writeValueAsString(paymentPayload);
-        OutboxEvent paymentEvent = new OutboxEvent(OutboxEventType.PAYMENT, payloadAsString);
+        OutboxEvent paymentEvent = new OutboxEvent(OutboxEventType.PAYMENT, payloadAsString, Instant.now(clock));
 
         outboxEventRepository.save(paymentEvent);
 
