@@ -22,10 +22,6 @@ public interface OutboxEventRepository
             Instant now
     );
 
-    default List<Long> findPending()  {
-       return findPending(Instant.now());
-    }
-
     @NativeQuery("""
         SELECT *
         FROM outbox_event
