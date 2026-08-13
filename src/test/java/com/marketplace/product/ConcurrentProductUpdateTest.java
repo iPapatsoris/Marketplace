@@ -42,7 +42,6 @@ public class ConcurrentProductUpdateTest {
     @BeforeEach
     void setup() {
         product = new ProductBuilder()
-                .withId(null)
                 .withVersion(10L)
                 .withName("chair")
                 .withPrice(new BigDecimal("30.00"))
