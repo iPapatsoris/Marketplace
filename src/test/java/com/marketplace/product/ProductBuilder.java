@@ -3,7 +3,7 @@ package com.marketplace.product;
 import java.math.BigDecimal;
 
 public class ProductBuilder {
-    private Long id = 1L;
+    private Long id = null;
     private Long version = 0L;
     private String name = "chair";
     private BigDecimal price = new BigDecimal(40);

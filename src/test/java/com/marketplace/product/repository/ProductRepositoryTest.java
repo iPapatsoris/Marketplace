@@ -29,7 +29,6 @@ class ProductRepositoryTest {
         @Test
         void shouldReserveInventory() {
             Product product = new ProductBuilder()
-                    .withId(null)
                     .withVersion(1L)
                     .withInventory(10)
                     .build();
@@ -70,7 +69,6 @@ class ProductRepositoryTest {
         @Test
         void shouldNotReserveInventoryWhenProdutDoesNotExist() {
             Product product = new ProductBuilder()
-                    .withId(null)
                     .build();
 
             Long id = (Long) entityManager.persistAndGetId(product);
@@ -89,7 +87,6 @@ class ProductRepositoryTest {
         @Test
         void shouldNotReserveInventoryWhenVersionsMismatch() {
             Product product = new ProductBuilder()
-                    .withId(null)
                     .withVersion(10L)
                     .build();
 
@@ -107,7 +104,6 @@ class ProductRepositoryTest {
         @Test
         void shouldNotReserveInventoryWhenInsufficient() {
             Product product = new ProductBuilder()
-                    .withId(null)
                     .withVersion(10L)
                     .withInventory(10)
                     .build();
@@ -126,7 +122,6 @@ class ProductRepositoryTest {
         @Test
         void shouldReserveInventoryWhenExactlyEqualToReservation() {
             Product product = new ProductBuilder()
-                    .withId(null)
                     .withVersion(10L)
                     .withInventory(10)
                     .build();
