@@ -18,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.Clock;
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -28,6 +30,7 @@ public class ReservationService {
     private final ProductRepository productRepository;
     private final ObjectMapper objectMapper;
     private final ReservationFactory reservationFactory;
+    private final Clock clock;
 
     /**
      * Reserves a quantity of the selected product. Protected against race conditions with optimistic locking.
@@ -60,11 +63,20 @@ public class ReservationService {
 
     @Transactional
     ReservationResponse getReservation(Long reservationId) {
-       Optional<Reservation> optionalReservation = reservationRepository.findById(reservationId);
+        Optional<Reservation> optionalReservation = reservationRepository.findById(reservationId);
         if (optionalReservation.isEmpty()) {
             throw new ReservationNotFoundException(reservationId);
         }
 
         return reservationMapper.toReservationResponse(optionalReservation.get());
+    }
+
+    @Transactional
+    public void expireReservations() {
+        List<Reservation> expiredReservations = reservationRepository.expireReservations(Instant.now(clock));
+        for (Reservation expiredReservation : expiredReservations) {
+            // N + 1 queries
+            productRepository.increaseInventory(expiredReservation.getId(), expiredReservation.getQuantity());
+        }
     }
 }

@@ -1,19 +1,18 @@
 package com.marketplace.reservation.scheduled;
 
-import com.marketplace.reservation.ReservationRepository;
+import com.marketplace.reservation.ReservationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
 public class ReservationExpirationJob {
-        private final ReservationRepository repository;
+        private final ReservationService reservationService;
 
         @Scheduled(fixedDelay = 60_000) // every minute
-        @Transactional
         public void expireReservations() {
-            repository.expireReservations();
+               reservationService.expireReservations();
+            }
         }
-    }

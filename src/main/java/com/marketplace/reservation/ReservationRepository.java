@@ -4,25 +4,22 @@ import com.marketplace.reservation.entity.Reservation;
 import com.marketplace.reservation.entity.ReservationStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.NativeQuery;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
-// TODO: use repository fragments to expose only the helpers of some of these methods
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
-    @Modifying
-    @Query("""
-        UPDATE Reservation 
+    @NativeQuery("""
+        UPDATE reservation 
         SET status = 'EXPIRED' 
-        WHERE status = 'ACTIVE' AND expiresAt <= :now
+        WHERE status = 'ACTIVE' AND expires_at <= :now
+        RETURNING *
 """)
-    void expireReservations(Instant now);
-
-    default void expireReservations() {
-        expireReservations(Instant.now());
-    }
+    List<Reservation> expireReservations(Instant now);
 
     @Modifying
     @Query("""
@@ -33,10 +30,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             AND expiresAt > :now
 """)
     int markAsPaymentInitiated(Long id, Instant now);
-
-    default int markAsPaymentInitiated(Long id) {
-        return markAsPaymentInitiated(id, Instant.now());
-    }
 
     @Modifying
     @Query("""
