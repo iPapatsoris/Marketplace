@@ -1,10 +1,11 @@
 package com.marketplace.outbox;
 
 import com.marketplace.annotations.RepositoryTest;
-import com.marketplace.outbox.OutboxEventProcessorTest.DummyPayload;
+import com.marketplace.outbox.processor.TestHandlerConfig;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,11 +19,13 @@ import java.util.Optional;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
 
+import static com.marketplace.outbox.processor.TestHandlerConfig.*;
 import static com.marketplace.util.ConcurrencyControl.await;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED;
 
 @RepositoryTest
+@Import(TestHandlerConfig.class)
 public class OutboxEventRepositoryTest {
 
     @Autowired
@@ -77,7 +80,7 @@ public class OutboxEventRepositoryTest {
         @DisplayName("If the event is locked by a transaction, others should NOT block when attempting to acquire it, should skip it instead")
         @Transactional(propagation = NOT_SUPPORTED)
         void shouldSkipEventIfLocked() throws ExecutionException, InterruptedException {
-            OutboxEvent outboxEvent = new OutboxEventBuilder<DummyPayload>().build(clock);
+            OutboxEvent outboxEvent = new OutboxEventBuilder<TestHandlerConfig.DummyPayload>().build(clock);
             Long id = tx.execute(status -> (Long) entityManager.persistAndGetId(outboxEvent));
 
             CountDownLatch rowLocked = new CountDownLatch(1);
@@ -109,7 +112,7 @@ public class OutboxEventRepositoryTest {
         @Transactional(propagation = NOT_SUPPORTED)
         void shouldLockDifferentEvents() throws ExecutionException, InterruptedException {
             OutboxEvent outboxEvent1 = new OutboxEventBuilder<DummyPayload>().build(clock);
-            OutboxEvent outboxEvent2 = new OutboxEventBuilder<DummyPayload>().build(clock);
+            OutboxEvent outboxEvent2 = new OutboxEventBuilder<TestHandlerConfig.DummyPayload>().build(clock);
 
             record InsertedIds(Long id1, Long id2) {}
 
