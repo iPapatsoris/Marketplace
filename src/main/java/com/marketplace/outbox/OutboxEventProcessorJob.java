@@ -16,6 +16,6 @@ public class OutboxEventProcessorJob {
 
     @Scheduled(fixedDelay = 5000)
     public void process() {
-        outboxEventService.process();
+        outboxEventService.processEvents();
     }
 }

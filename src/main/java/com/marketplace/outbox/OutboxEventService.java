@@ -54,7 +54,7 @@ public class OutboxEventService {
      * made. This is because each transaction holds a lock on the job it's processing, with SKIP LOCKED
      * so that other instances will skip locked jobs and move to the next available one.
      */
-    public void process() {
+    public void processEvents() {
         List<Long> eventsIds = outboxRepository.findPending(Instant.now(clock));
 
         for (Long eventId : eventsIds) {
