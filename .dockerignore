@@ -1,0 +1,11 @@
+target/
+.idea/
+.vscode/
+data/
+.git*
+*.iml
+.DS_Store
+.env
+compose.yaml
+Dockerfile
+HELP.md

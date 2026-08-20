@@ -1,6 +1,6 @@
 package com.marketplace.product;
 
-import com.marketplace.reservation.Reservation;
+import com.marketplace.reservation.entity.Reservation;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;

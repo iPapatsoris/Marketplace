@@ -2,26 +2,42 @@ package com.marketplace.outbox;
 
 import com.marketplace.outbox.exception.OutboxEventFailureException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 import tools.jackson.databind.ObjectMapper;
 
+import java.time.Clock;
 import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.TemporalAmount;
 import java.util.List;
 import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class OutboxEventProcessor {
+public class OutboxEventService {
+    private final Clock clock;
+
+    public void markProcessed(OutboxEvent outboxEvent) {
+        outboxEvent.markProcessed(Instant.now(clock));
+    }
+
+    public void markFailed(OutboxEvent outboxEvent) {
+        outboxEvent.markFailed(Instant.now(clock));
+    }
+
+    public void scheduleRetry(OutboxEvent outboxEvent, TemporalAmount delay) {
+        outboxEvent.scheduleRetry(Instant.now(clock).plus(delay));
+    }
+
     private final OutboxEventRepository outboxRepository;
     private final OutboxEventHandlerRegistry registry;
     private final TransactionTemplate transactionTemplate;
     private final ObjectMapper objectMapper;
 
     /**
-     * Scheduled task with a fixed delay that collects pending jobs and
-     * runs each on their own transaction. This ensures that if an unhandled exception occurs in one job,
+     * Collects pending jobs and
+     * runs each on their own transaction. This ensures that if an unhandled exception occurs in one,
      * only that one will roll back, without losing previous or future work on others.
      * After rollback, the exception is caught outside the transaction and another transaction is created to
      * schedule a retry. The retry scheduling updates error log counters and reschedules the job in the future with
@@ -38,16 +54,15 @@ public class OutboxEventProcessor {
      * made. This is because each transaction holds a lock on the job it's processing, with SKIP LOCKED
      * so that other instances will skip locked jobs and move to the next available one.
      */
-    @Scheduled(fixedDelay = 5000)
-    public void process() {
-        List<Long> eventsIds = outboxRepository.findPending();
+    public void processEvents() {
+        List<Long> eventsIds = outboxRepository.findPending(Instant.now(clock));
 
         for (Long eventId : eventsIds) {
             try {
                 transactionTemplate.executeWithoutResult(status -> {
                     processEvent(eventId);
                 });
-            } catch (Exception ex) {
+            } catch (RuntimeException e) {
                 transactionTemplate.executeWithoutResult(status -> {
                     scheduleRetry(eventId);
                 });
@@ -55,10 +70,10 @@ public class OutboxEventProcessor {
         }
     }
 
-    void processEvent(Long eventId) {
+    private void processEvent(Long eventId) {
         Optional<OutboxEvent> optionalEvent = outboxRepository.findAndLockSingleEventSkipLocked(eventId);
         if (optionalEvent.isEmpty()) {
-            System.out.println("Event with id %d not found".formatted(eventId)); // switch to a warning log
+            System.out.printf("Event with id %d already being processed or doesn't exist, skipping%n", eventId); // switch to a warning log
             return;
         }
 
@@ -67,19 +82,22 @@ public class OutboxEventProcessor {
         try {
             runHandler(event);
         } catch (OutboxEventFailureException ex) {
-            event.markFailed();
+            markFailed(event);
             return;
         }
-        event.markProcessed();
+        markProcessed(event);
     }
 
-    void scheduleRetry(Long eventId) {
+    private void scheduleRetry(Long eventId) {
         Optional<OutboxEvent> failedEventOptional = outboxRepository.findById(eventId);
         if (failedEventOptional.isEmpty()) {
             System.out.printf("Event with id %d not found%n", eventId); // switch to a warning log
             return;
         }
-        failedEventOptional.get().scheduleRetry(Duration.ofMinutes(1));
+        scheduleRetry(
+                failedEventOptional.get(),
+                Duration.ofMinutes(1)
+        );
     }
 
     @SuppressWarnings("unchecked")

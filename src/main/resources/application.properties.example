@@ -1,12 +1,11 @@
 spring.application.name=Marketplace
 
-spring.datasource.url=
-spring.datasource.username=
-spring.datasource.password=
+spring.datasource.url==${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/marketplace}
+spring.datasource.username=${SPRING_DATASOURCE_USERNAME}
+spring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
 
 spring.jpa.hibernate.ddl-auto=update
 
-spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
 logging.level.org.hibernate.SQL=DEBUG
 logging.level.org.hibernate.orm.jdbc.bind=TRACE
@@ -18,3 +17,7 @@ spring.jackson.deserialization.fail-on-unknown-properties=true
 # To error when passing string to a number type in DTOs
 # Still allows passing number to a string type and converts
 spring.jackson.mapper.allow-coercion-of-scalars=false
+
+# Used in conjuction with @ConditionalOnProperty on classes that contain scheduled methods
+# Allows disabling scheduling in testing to avoid side effects
+scheduler.enabled=true

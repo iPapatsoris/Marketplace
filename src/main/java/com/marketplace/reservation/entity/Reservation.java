@@ -1,13 +1,12 @@
-package com.marketplace.reservation;
+package com.marketplace.reservation.entity;
 
 import com.marketplace.product.Product;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 
-import static com.marketplace.reservation.ReservationStatus.ACTIVE;
+import static com.marketplace.reservation.entity.ReservationStatus.ACTIVE;
 
 @Entity
 @Table
@@ -37,8 +36,12 @@ public class Reservation {
     @Column
     private Long orderId;
 
-    public Reservation() {
+    Reservation(Instant expiresAt, String productSnapshot, Product product) {
         status = ACTIVE;
-        expiresAt = Instant.now().plus(10, ChronoUnit.MINUTES);
+        this.expiresAt = expiresAt;
+        this.productSnapshot = productSnapshot;
+        this.product = product;
     }
+
+    protected Reservation() {}
 }

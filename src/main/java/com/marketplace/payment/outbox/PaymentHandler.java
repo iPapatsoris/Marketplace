@@ -1,5 +1,7 @@
 package com.marketplace.payment.outbox;
 
+import com.marketplace.payment.provider.PaymentProvider;
+import com.marketplace.payment.provider.PaymentResult;
 import com.marketplace.reservation.ReservationRepository;
 import com.marketplace.order.Order;
 import com.marketplace.order.OrderRepository;
@@ -17,6 +19,7 @@ import java.util.Optional;
 public class PaymentHandler implements OutboxEventHandler<PaymentPayload> {
     private final ReservationRepository reservationRepository;
     private final OrderRepository orderRepository;
+    private final PaymentProvider paymentProvider;
 
     @Override
     public OutboxEventType supports() {
@@ -30,22 +33,22 @@ public class PaymentHandler implements OutboxEventHandler<PaymentPayload> {
 
     @Override
     public void handle(PaymentPayload payload) {
-        System.out.println("Payment handler");
         Long reservationId = payload.reservationId();
 
-        // On user error
-        if (false) {
-            // Revert reservation to ACTIVE
-            // Give the user more chances until it expires
-            // Do NOT roll back event; if they re-attempt payment, a new one will be created
-            reservationRepository.markAsActive(reservationId);
-            return;
+        PaymentResult paymentResult;
+        try {
+            paymentResult = paymentProvider.complete();
+        } catch (Exception ex) {
+            throw new PaymentTransientException(reservationId);
         }
 
-        // On transient error
-        if (false) {
-            // Rollback, schedule retry
-            throw new PaymentTransientException(reservationId);
+        if (paymentResult == PaymentResult.DECLINED) {
+            // Revert reservation to ACTIVE
+            // Give the user more chances until it expires
+            // Do NOT rollback event, let it be marked as PROCESSED
+            // If they re-attempt payment, a new one event will be created
+            reservationRepository.markAsActive(reservationId);
+            return;
         }
 
         // On success
